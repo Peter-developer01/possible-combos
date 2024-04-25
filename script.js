@@ -41,7 +41,7 @@ const generateButton = document.querySelector(".generate"),
 
 generateButton.addEventListener("click", () => {
 	document.querySelector(".result-h2").style.display = "block";
-	const numbers = list.value.replaceAll("\n", ", ").split(", ").map(Number).filter(num => !Number.isNaN(num));
+	const numbers = list.value.replaceAll("\n", "!").replaceAll(",", ".").replaceAll(" ", "").split("!").map(Number).filter(num => !Number.isNaN(num));
 	let results = combinationSum(numbers, target.value).filter(result => hasUniqueNumbers(result));
 	results = removeNonUniqueArrays(results);
 	results = results.map(result => `<li>${result.join(" + ")} = ${target.value}</li>`)
