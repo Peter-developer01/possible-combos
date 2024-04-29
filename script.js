@@ -1,37 +1,44 @@
 function combinationSum(nums, target) {
     const memo = {};
 
-    // remove duplicates from the array
     nums = nums.sort((a, b) => a - b).filter((num, index, arr) => index === 0 || num !== arr[index - 1]);
 
-    function dp(start, target) {
-        if (memo[target]) {
+    function combinationSumHelper(target, startIndex) {
+        if (target in memo) {
             return memo[target];
         }
+
         if (target === 0) {
             return [[]];
         }
+
         if (target < 0) {
             return [];
         }
-        const res = [];
-		const used = [];
-        for (let i = start; i < nums.length; i++) {
-            const num = nums[i];
-			console.log(used)
-			if (used.includes(num)) continue;
-            if (target - num >= 0) {
-                for (const comb of dp(i, target - num)) {
-                    res.push([num, ...comb]);
-                }
+
+        let result = [];
+
+        for (let i = startIndex; i < nums.length; i++) {
+            const currentNum = +nums[i].toFixed(1);
+            const currentTarget = +(target - currentNum * factor).toFixed(1);
+
+            const combinations = combinationSumHelper(currentTarget, i);
+
+            for (let j = 0; j < combinations.length; j++) {
+                combinations[j].push(currentNum);
+                result.push(combinations[j]);
             }
-			used.push(num);
         }
-        memo[target] = res;
-        return res;
+
+        memo[target] = result;
+        return result;
     }
 
-    return dp(0, target);
+    const factor = 100; // Adjust this factor as needed
+    const targetInt = target * factor;
+    const result = combinationSumHelper(targetInt, 0);
+
+    return result;
 }
 
 const generateButton = document.querySelector(".generate"),
@@ -41,8 +48,8 @@ const generateButton = document.querySelector(".generate"),
 
 generateButton.addEventListener("click", () => {
 	document.querySelector(".result-h2").style.display = "block";
-	const numbers = list.value.replaceAll("\n", "!").replaceAll(",", ".").replaceAll(" ", "").split("!").map(Number).filter(num => !Number.isNaN(num));
-	let results = combinationSum(numbers, target.value).filter(result => hasUniqueNumbers(result));
+	const numbers = list.value.replaceAll("\n", "!").replaceAll(", ", "!").replaceAll(",", ".").replaceAll(" ", "").split("!").map(Number).filter(num => !Number.isNaN(num));
+	let results = combinationSum(numbers, parseFloat(target.value)).filter(result => hasUniqueNumbers(result));
 	results = removeNonUniqueArrays(results);
 	results = results.map(result => `<li>${result.join(" + ")} = ${target.value}</li>`)
 	result.innerHTML = results.join(" ");
